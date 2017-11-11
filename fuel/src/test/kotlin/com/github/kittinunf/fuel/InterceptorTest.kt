@@ -5,6 +5,7 @@ import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
+import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
@@ -50,7 +51,22 @@ class InterceptorTest : BaseTestCase() {
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
-    
+
+    @Test
+    fun testWithLoggingResponseInterceptor() {
+        val manager = FuelManager()
+
+        manager.addResponseInterceptor{ loggingResponseInterceptor() }
+
+        val (request, response, result) = manager.request(Method.GET, "http://httpbin.org/get").responseObject(HttpBinUserAgentModelDeserializer())
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+    }
+
     @Test
     fun testWithMultipleInterceptors() {
         val manager = FuelManager()
