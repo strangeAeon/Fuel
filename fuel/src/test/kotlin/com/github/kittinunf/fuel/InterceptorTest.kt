@@ -10,6 +10,7 @@ import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
+import java.io.InputStream
 import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
@@ -18,7 +19,10 @@ class InterceptorTest : BaseTestCase() {
     //Deserializer
     class HttpBinUserAgentModelDeserializer : ResponseDeserializable<RequestObjectTest.HttpBinUserAgentModel> {
 
-        override fun deserialize(content: String) = RequestObjectTest.HttpBinUserAgentModel(content)
+        override fun deserialize(inputStream: InputStream): RequestObjectTest.HttpBinUserAgentModel? {
+           val content = inputStream.readBytes().toString(Charsets.UTF_8)
+            return RequestObjectTest.HttpBinUserAgentModel(content)
+        }
 
     }
 

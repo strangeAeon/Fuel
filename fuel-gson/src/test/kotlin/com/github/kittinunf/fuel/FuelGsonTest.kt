@@ -3,17 +3,22 @@ package com.github.kittinunf.fuel
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Handler
+import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
+import com.github.kittinunf.fuel.core.ResponseDeserializable
+import com.github.kittinunf.fuel.core.interceptors.loggingResponseInterceptor
 import com.github.kittinunf.fuel.gson.gsonDeserializerOf
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.result.Result
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.isA
 import org.hamcrest.CoreMatchers.notNullValue
 import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Test
+import java.io.InputStream
 
 /**
  * Created by ihor_kucherenko on 7/4/17.
@@ -31,6 +36,16 @@ class FuelGsonTest {
 
     //Model
     data class HttpBinUserAgentModel(var userAgent: String = "")
+
+    //Deserializer
+    class HttpBinUserAgentModelDeserializer : ResponseDeserializable<HttpBinUserAgentModel> {
+
+        override fun deserialize(inputStream: InputStream): HttpBinUserAgentModel? {
+            val content = inputStream.readBytes().toString(Charsets.UTF_8)
+            return HttpBinUserAgentModel(content)
+        }
+
+    }
 
     @Test
     fun gsonTestResponseObject() {
@@ -96,6 +111,21 @@ class FuelGsonTest {
                     }
 
                 })
+    }
+
+    @Test
+    fun testWithLoggingResponseInterceptor() {
+        val manager = FuelManager()
+
+        manager.addResponseInterceptor{ loggingResponseInterceptor() }
+
+        val (request, response, result) = manager.request(Method.GET, "http://httpbin.org/get").responseObject(gsonDeserializerOf<HttpBinUserAgentModel>())
+        val (data, error) = result
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, CoreMatchers.nullValue())
+        assertThat(data, notNullValue())
     }
 
     @Test
