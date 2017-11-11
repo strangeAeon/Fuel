@@ -2,6 +2,7 @@ package com.github.kittinunf.fuel
 
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Method
+import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.github.kittinunf.fuel.core.interceptors.cUrlLoggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.loggingRequestInterceptor
 import com.github.kittinunf.fuel.core.interceptors.validatorResponseInterceptor
@@ -12,6 +13,13 @@ import java.net.HttpURLConnection
 import org.hamcrest.CoreMatchers.`is` as isEqualTo
 
 class InterceptorTest : BaseTestCase() {
+
+    //Deserializer
+    class HttpBinUserAgentModelDeserializer : ResponseDeserializable<RequestObjectTest.HttpBinUserAgentModel> {
+
+        override fun deserialize(content: String) = RequestObjectTest.HttpBinUserAgentModel(content)
+
+    }
 
     @Test
     fun testWithNoInterceptor() {
@@ -42,7 +50,7 @@ class InterceptorTest : BaseTestCase() {
 
         assertThat(response.statusCode, isEqualTo(HttpURLConnection.HTTP_OK))
     }
-
+    
     @Test
     fun testWithMultipleInterceptors() {
         val manager = FuelManager()
