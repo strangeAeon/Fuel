@@ -1,11 +1,12 @@
 package com.github.kittinunf.fuel.toolbox
 
 import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Method
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.core.Response
-import com.github.kittinunf.fuel.core.Client
-import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.util.ReusableInputStream
 import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -50,13 +51,13 @@ internal class HttpClient(private val proxy: Proxy? = null) : Client {
                     responseMessage = connection.responseMessage.orEmpty(),
                     dataStream = try {
                         val stream = connection.errorStream ?: connection.inputStream
-                        if (contentEncoding.compareTo("gzip", true) == 0) GZIPInputStream(stream) else stream
+                        if (contentEncoding.compareTo("gzip", true) == 0) ReusableInputStream(GZIPInputStream(stream)) else ReusableInputStream(stream)
                     } catch (exception: IOException) {
                         try {
                             connection.errorStream ?: connection.inputStream?.close()
                         } catch (exception: IOException) {
                         }
-                        ByteArrayInputStream(ByteArray(0))
+                        ReusableInputStream(ByteArrayInputStream(ByteArray(0)))
                     }
             )
         } catch (exception: Exception) {

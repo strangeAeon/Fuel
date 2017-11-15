@@ -12,9 +12,10 @@ class ReusableInputStream(var inputStream: InputStream): InputStream() {
     init {
         if (!inputStream.markSupported()) {
             inputStream = BufferedInputStream(inputStream)
-            throw IllegalArgumentException("Marking not supported")
+            throw IllegalArgumentException("Marking not supported !")
         }
 
+        println(inputStream.markSupported())
         inputStream.mark(Int.MAX_VALUE)
     }
 

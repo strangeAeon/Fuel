@@ -1,5 +1,6 @@
 package com.github.kittinunf.fuel.core
 
+import com.github.kittinunf.fuel.util.ReusableInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -11,7 +12,7 @@ class Response(
         val responseMessage: String = "",
         val headers: Map<String, List<String>> = emptyMap(),
         val contentLength: Long = 0L,
-        val dataStream: InputStream = ByteArrayInputStream(ByteArray(0))
+        val dataStream: InputStream = ReusableInputStream(ByteArrayInputStream(ByteArray(0)))
 ) {
     @Deprecated(replaceWith = ReplaceWith("contentLength"), message = "http naming is deprecated, use 'contentLength' instead")
     val httpContentLength get() = contentLength
