@@ -469,6 +469,40 @@ class RequestTest : BaseTestCase() {
     }
 
     @Test
+    fun httpDeleteRequestWithBody() {
+        var request: Request? = null
+        var response: Response? = null
+        var data: Any? = null
+        var error: FuelError? = null
+
+        val foo = "foo"
+        val bar = "bar"
+        val body = "{ $foo : $bar }"
+
+        manager.request(Method.DELETE, "http://httpbin.org/delete").body(body).responseString { req, res, result ->
+            request = req
+            response = res
+
+            val (d, err) = result
+            data = d
+            error = err
+        }
+
+        val string = data as String
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(error, nullValue())
+        assertThat(data, notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response?.statusCode, isEqualTo(statusCode))
+
+        assertThat(string, containsString(foo))
+        assertThat(string, containsString(bar))
+    }
+
+    @Test
     fun httpHeadRequest() {
         var request: Request? = null
         var response: Response? = null

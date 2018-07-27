@@ -151,6 +151,25 @@ class BlockingRequestTest : BaseTestCase() {
     }
 
     @Test
+    fun httpDeleteRequestWithBody() {
+        val foo = "foo"
+        val bar = "bar"
+        val body = "{ $foo : $bar }"
+
+        val (request, response, data) = manager.request(Method.DELETE, "http://httpbin.org/delete").body(body).responseString()
+
+        assertThat(request, notNullValue())
+        assertThat(response, notNullValue())
+        assertThat(data.get(), notNullValue())
+
+        val statusCode = HttpURLConnection.HTTP_OK
+        assertThat(response.statusCode, isEqualTo(statusCode))
+
+        assertThat(data.get(), containsString(foo))
+        assertThat(data.get(), containsString(bar))
+    }
+
+    @Test
     fun httpGetRequestWithPathStringConvertible() {
         val (request, response, data) = manager.request(Method.GET, HttpsBin.USER_AGENT).responseString()
 
